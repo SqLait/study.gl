@@ -1,33 +1,23 @@
+#include <gfx/shader.hpp>
 #include "window.hpp"
+#include <types.hpp>
+#include <glad/glad.h>
 
-bool sdl_event_check(SDL_Event &event, Window &window);
+bool poll_event(SDL_Event &event, Window &window);
 
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-};  
+    0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    0.0f,  0.5f, 0.0f   // top 
+};
 
-unsigned int VBO, VAO;
-unsigned int fragmentShader;
-unsigned int vertexShader;
-unsigned int shaderProgram;
-
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n";
+u32 VBO, VAO;
+u32 fragmentShader;
+u32 vertexShader;
+Shader *shad = nullptr;
 
 void update() {
-    glUseProgram(shaderProgram);
+    shad->use();
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -36,22 +26,8 @@ int main() {
     Window window {800, 600};
     window.create();
 
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
-
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragShaderSource, nullptr);
-    glCompileShader(fragmentShader);
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glUseProgram(shaderProgram);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader shader {"glsl/vertex.glsl", "glsl/fragment.glsl"};
+    shad = &shader;
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -70,8 +46,9 @@ int main() {
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
+
     SDL_Event event;
-    while (sdl_event_check(event, window)) {
+    while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -82,24 +59,29 @@ int main() {
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
     window.destroy();
 
     return 0;
 }
 
-bool sdl_event_check(SDL_Event &event, Window &window) {
+bool poll_event(SDL_Event &event, Window &window) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_EVENT_QUIT) {
             return false;
         } else if (event.type == SDL_EVENT_WINDOW_RESIZED) {
             window.update_size(event);
         } else if (event.type == SDL_EVENT_KEY_DOWN) {
-            if (event.key.key == SDLK_ESCAPE) {
-                return false;
+            switch (event.key.key) {
+                case SDLK_ESCAPE:
+                    return false;
+                case SDLK_L:
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                    break;
+                case SDLK_F:
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    break;
             }
         }
     }
     return true;
 }
-

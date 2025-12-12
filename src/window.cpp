@@ -1,7 +1,7 @@
 #include "window.hpp"
-#include <cstdlib>
+#include <glad/glad.h>
 
-Window::Window(const int _width, const int _height) {
+Window::Window(const u32 _width, const u32 _height) {
     width = _width;
     height = _height;
 }

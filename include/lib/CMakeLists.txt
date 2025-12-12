@@ -9,3 +9,5 @@ target_include_directories(lib
         PUBLIC
         include
 )
+
+target_link_libraries(lib PUBLIC util)
