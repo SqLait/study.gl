@@ -39,6 +39,22 @@ void Shader::use() {
     glUseProgram(id);
 }
 
+void Shader::set_bool(const char *name, bool value) {
+    glUniform1i(glGetUniformLocation(id, name), (i32)value);
+}
+
+void Shader::set_i32(const char *name, i32 value) {
+    glUniform1i(glGetUniformLocation(id, name), value);
+}
+
+void Shader::set_f32(const char *name, f32 value) {
+    glUniform1f(glGetUniformLocation(id, name), value);
+}
+
+const u32 Shader::get_id() {
+    return id;
+}
+
 void Shader::compile_shader(u32 shader, const char *glsl) {
     glShaderSource(shader, 1, &glsl, NULL);
     glCompileShader(shader);

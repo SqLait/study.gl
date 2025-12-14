@@ -4,6 +4,8 @@ target_sources(util
         PUBLIC
         src/shader.cpp
         src/gfx_debug.cpp
+        src/stb_images.cpp
+        src/texture.cpp
 )
 
 target_include_directories(util
