@@ -3,6 +3,7 @@
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_time.h"
 #include "gfx/texture.hpp"
+#include "object.hpp"
 #include "window.hpp"
 #include <types.hpp>
 #include <glad/glad.h>
@@ -10,7 +11,7 @@
 
 bool poll_event(SDL_Event &event, Window &window);
 
-float vertices[] = {
+f32 vertices[] = {
     // positions          // colors           // texture coords
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
@@ -18,7 +19,7 @@ float vertices[] = {
     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 };
 
-unsigned int indices[] = {  
+u32 indices[] = {  
     0, 1, 3, // first triangle
     1, 2, 3  // second triangle
 };
@@ -52,6 +53,8 @@ int main() {
     Shader shader {"glsl/vertex.glsl", "glsl/fragment.glsl"};
     shad = &shader;
 
+    Object obj {vertices, indices};
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -59,10 +62,10 @@ int main() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (obj.vertices.size() * sizeof(f32)), obj.vertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (obj.indices.size() * sizeof(u32)), obj.indices.data(), GL_STATIC_DRAW);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);

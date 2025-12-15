@@ -6,6 +6,7 @@ target_sources(util
         src/gfx_debug.cpp
         src/stb_images.cpp
         src/texture.cpp
+        src/object.cpp
 )
 
 target_include_directories(util
