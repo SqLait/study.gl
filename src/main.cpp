@@ -1,7 +1,4 @@
-#include <cmath>
 #include <gfx/shader.hpp>
-#include "SDL3/SDL_stdinc.h"
-#include "SDL3/SDL_time.h"
 #include "gfx/texture.hpp"
 #include "object.hpp"
 #include "window.hpp"
@@ -16,7 +13,7 @@ f32 vertices[] = {
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
 };
 
 u32 indices[] = {  
@@ -41,19 +38,19 @@ void update() {
 }
 
 int main() {
-    Window window {800, 600};
+    Window window(800, 600);
     window.create();
 
-    Texture texture {"assets/container.jpg"};
+    Texture texture("assets/container.jpg");
     tex = &texture;
 
-    Texture texture2 {"assets/awesomeface.png", GLTexUnit::GL1};
+    Texture texture2("assets/awesomeface.png", GLTexUnit::GL1);
     tex2 = &texture2;
 
-    Shader shader {"glsl/vertex.glsl", "glsl/fragment.glsl"};
+    Shader shader("glsl/vertex.glsl", "glsl/fragment.glsl");
     shad = &shader;
 
-    Object obj {vertices, indices};
+    Object obj(vertices, indices);
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
