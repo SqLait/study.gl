@@ -62,13 +62,6 @@ int main() {
 
     multi.set_sampler(shader);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
-    trans = glm::rotate(trans, (float)SDL_GetTicks(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-    unsigned int transformLoc = glGetUniformLocation(shader.get_id(), "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
     SDL_Event event;
     while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
