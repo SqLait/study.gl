@@ -1,12 +1,11 @@
 #include <gfx/texture.hpp>
 #include <glad/glad.h>
-#include <optional>
 #include <stb/images.h>
 #include <iostream>
 
 Texture::Texture(const char *path) {
     glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0 + (byte)tex_unit);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
     set_texture_params();
@@ -14,10 +13,9 @@ Texture::Texture(const char *path) {
     load_texture(stbi_load(path, &width, &height, &nr_channels, 0));
 }
 
-Texture::Texture(const char *path, const GLTexUnit texture_unit) {
-    tex_unit = texture_unit;
+Texture::Texture(const char *path, const u32 texture_unit) {
     glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0 + (byte)tex_unit);
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, texture);
 
     set_texture_params();

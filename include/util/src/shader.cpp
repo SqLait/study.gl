@@ -80,6 +80,6 @@ static void shader_compile_status(u32 shader) {
 
     if(!success) {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "Shader err: COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 }

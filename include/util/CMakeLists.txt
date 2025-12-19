@@ -7,6 +7,7 @@ target_sources(util
         src/stb_images.cpp
         src/texture.cpp
         src/object.cpp
+        src/multitexture.cpp
 )
 
 target_include_directories(util
@@ -14,4 +15,4 @@ target_include_directories(util
         include
 )
 
-target_link_libraries(util PUBLIC lib)
+target_link_libraries(util PUBLIC lib glm::glm)
