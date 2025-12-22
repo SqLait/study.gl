@@ -1,25 +1,18 @@
 #include <gfx/shader.hpp>
+#include "SDL3/SDL_keycode.h"
 #include "gfx/multitexture.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "object.hpp"
+#include "transform.hpp"
 #include "window.hpp"
 #include <types.hpp>
 #include <glad/glad.h>
 #include <stb/images.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 bool poll_event(SDL_Event &event, Window &window);
-
-f32 vertices2[] = {
-    // positions          // colors           // texture coords
-     0.2f,  0.2f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.2f, -0.2f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.2f, -0.2f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.2f,  0.2f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
-};
 
 f32 vertices[] = {
     // positions          // colors           // texture coords
@@ -37,6 +30,7 @@ u32 indices[] = {
 Shader *shad = nullptr;
 MultiTexture *mult = nullptr;
 Object *ob = nullptr;
+glm::mat4 transform;
 
 void update() {
     shad->use();
@@ -63,18 +57,19 @@ int main() {
     multi.set_sampler(shader);
 
     SDL_Event event;
+    unsigned int transformLoc = glGetUniformLocation(shader.get_id(), "transform");
+
     while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         update();
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
-        trans = glm::rotate(trans, (float)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f)); // switched the order
+        transform = glm::rotate(transform, (f32)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f)); // switched the order
 
-        unsigned int transformLoc = glGetUniformLocation(shader.get_id(), "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
         SDL_GL_SwapWindow(window.get_window());
     }
 

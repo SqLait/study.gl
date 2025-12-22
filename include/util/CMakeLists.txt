@@ -8,6 +8,7 @@ target_sources(util
         src/texture.cpp
         src/object.cpp
         src/multitexture.cpp
+        src/transform.cpp
 )
 
 target_include_directories(util
