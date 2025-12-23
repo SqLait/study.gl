@@ -1,4 +1,6 @@
 #include "gfx/debug.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <gfx/shader.hpp>
 #include <glad/glad.h>
 #include <iostream>
@@ -49,6 +51,10 @@ void Shader::set_i32(const char *name, i32 value) {
 
 void Shader::set_f32(const char *name, f32 value) {
     glUniform1f(glGetUniformLocation(id, name), value);
+}
+
+void Shader::set_mat4(const char *name, glm::mat4 value) {
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 u32 Shader::get_id() {

@@ -14,7 +14,7 @@ MultiTexture::MultiTexture(std::span<const char *> paths) {
 void MultiTexture::set_sampler(Shader &shader) {
     shader.use();
     for (usize i = 0; i < textures.size(); i++) {
-        std::string sampler_name = "tex" + std::to_string(i + 1);
+        std::string sampler_name = "texture" + std::to_string(i + 1);
         shader.set_i32(sampler_name.c_str(), i);
     }
 }

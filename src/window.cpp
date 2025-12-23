@@ -53,6 +53,14 @@ void Window::update_size(SDL_Event &event) {
     glViewport(0, 0, width, height);
 }
 
+u32 Window::get_height() {
+    return height;
+}
+
+u32 Window::get_width() {
+    return width;
+}
+
 auto Window::get_window() -> SDL_Window * {
     return window;
 }

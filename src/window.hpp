@@ -19,6 +19,8 @@ public:
     void destroy();
     void update_size(SDL_Event &event);
     auto get_window() -> SDL_Window *;
+    u32 get_height();
+    u32 get_width();
 private:
     bool create_gl_context();
 };

@@ -1,6 +1,7 @@
 #include <gfx/shader.hpp>
 #include "SDL3/SDL_keycode.h"
 #include "gfx/multitexture.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include "object.hpp"
@@ -15,19 +16,54 @@
 
 bool poll_event(SDL_Event &event, Window &window);
 
-f32 vertices[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
 u32 indices[] = {  
     0, 1, 3, // first triangle
     1, 2, 3  // second triangle
 };
- 
 Shader *shad = nullptr;
 MultiTexture *mult = nullptr;
 Object *ob = nullptr;
@@ -37,13 +73,12 @@ void update() {
     mult->draw();
 
     glBindVertexArray(ob->vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 int main() {
     Window window(800, 600);
     window.create();
-    Time time;
 
     const char *paths[] = {"assets/container.jpg", "assets/awesomeface.png", "assets/brick.png"};
     MultiTexture multi(paths);
@@ -58,17 +93,31 @@ int main() {
     multi.set_sampler(shader);
 
     SDL_Event event;
-    u32 trans_loc = shader.get_uniform_location("transform");
-    Transform trans;
 
+    glEnable(GL_DEPTH_TEST);
     while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+
+        model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(0.8f, 1.0f, 0.4f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(
+            glm::radians(45.0f),
+            (f32)window.get_width() / (f32)window.get_height(), 0.1f, 100.0f);
+
+        u32 modelLoc = shader.get_uniform_location("model");
+        u32 viewLoc = shader.get_uniform_location("view");
+        u32 projLoc = shader.get_uniform_location("projection");
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
         update();
-        trans.rotate(time.delta_time() * 1, glm::vec3(0, 0, -1));
 
-        glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans.get_trans_mtrx()));
         SDL_GL_SwapWindow(window.get_window());
     }
 
