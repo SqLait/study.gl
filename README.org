@@ -1,0 +1,27 @@
+#+TITLE: study.gl
+
+*study.gl* is a repository where I implement a rendering engine using C++ and OpenGL.
+
+* Building
+Make sure you have the following tools installed:
+- just :: command runner
+- cmake :: build system
+- gcc or clang :: compiler
+- git :: to fetch the project + its dependencies
+
+You can download them with your favourite package manager:
+#+BEGIN_SRC sh
+sudo pacman -S git cmake make just gcc
+#+END_SRC
+
+In order to build the app you should first clone the repository:
+#+BEGIN_SRC sh
+git clone https://github.com/SqLait/study.gl.git
+#+END_SRC
+
+After that, you can compile and run the project like so:
+
+#+BEGIN_SRC sh
+just init
+just run
+#+END_SRC

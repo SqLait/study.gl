@@ -1,9 +1,11 @@
 #include <gfx/shader.hpp>
 #include "SDL3/SDL_keycode.h"
 #include "gfx/multitexture.hpp"
+#include "glm/detail/qualifier.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "object.hpp"
+#include "time/time.hpp"
 #include "transform.hpp"
 #include "window.hpp"
 #include <types.hpp>
@@ -30,7 +32,6 @@ u32 indices[] = {
 Shader *shad = nullptr;
 MultiTexture *mult = nullptr;
 Object *ob = nullptr;
-glm::mat4 transform;
 
 void update() {
     shad->use();
@@ -43,6 +44,7 @@ void update() {
 int main() {
     Window window(800, 600);
     window.create();
+    Time time;
 
     const char *paths[] = {"assets/container.jpg", "assets/awesomeface.png", "assets/brick.png"};
     MultiTexture multi(paths);
@@ -58,18 +60,16 @@ int main() {
 
     SDL_Event event;
     unsigned int transformLoc = glGetUniformLocation(shader.get_id(), "transform");
+    Transform trans;
 
     while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         update();
+        trans.rotate(time.delta_time() * 1, glm::vec3(0, 0, -1));
 
-        transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f)); // switched the order
-        transform = glm::rotate(transform, (f32)SDL_GetTicks() / 1000, glm::vec3(0.0f, 0.0f, 1.0f)); // switched the order
-
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans.get_trans_mtrx()));
         SDL_GL_SwapWindow(window.get_window());
     }
 
