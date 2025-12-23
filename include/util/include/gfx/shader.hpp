@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include <types.hpp>
 
 class Shader {
@@ -11,7 +12,8 @@ public:
     void set_bool(const char *name, bool value);
     void set_i32(const char *name, i32 value);
     void set_f32(const char *name, f32 value);
-    const u32 get_id();
+    u32 get_id();
+    u32 get_uniform_location(const char *uniform);
 
 private:
     void compile_shader(u32 shader, const char *glsl);

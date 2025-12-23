@@ -2,6 +2,7 @@
 #include "SDL3/SDL_keycode.h"
 #include "gfx/multitexture.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/trigonometric.hpp"
 #include "object.hpp"
 #include "time/time.hpp"
 #include "transform.hpp"
@@ -57,7 +58,7 @@ int main() {
     multi.set_sampler(shader);
 
     SDL_Event event;
-    unsigned int transformLoc = glGetUniformLocation(shader.get_id(), "transform");
+    u32 trans_loc = shader.get_uniform_location("transform");
     Transform trans;
 
     while (poll_event(event, window)) {
@@ -67,7 +68,7 @@ int main() {
         update();
         trans.rotate(time.delta_time() * 1, glm::vec3(0, 0, -1));
 
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans.get_trans_mtrx()));
+        glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans.get_trans_mtrx()));
         SDL_GL_SwapWindow(window.get_window());
     }
 

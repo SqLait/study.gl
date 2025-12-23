@@ -51,8 +51,12 @@ void Shader::set_f32(const char *name, f32 value) {
     glUniform1f(glGetUniformLocation(id, name), value);
 }
 
-const u32 Shader::get_id() {
+u32 Shader::get_id() {
     return id;
+}
+
+u32 Shader::get_uniform_location(const char *uniform) {
+    return glGetUniformLocation(id, uniform);
 }
 
 void Shader::compile_shader(u32 shader, const char *glsl) {
