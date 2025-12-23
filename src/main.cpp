@@ -1,8 +1,6 @@
 #include <gfx/shader.hpp>
 #include "SDL3/SDL_keycode.h"
 #include "gfx/multitexture.hpp"
-#include "glm/detail/qualifier.hpp"
-#include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "object.hpp"
 #include "time/time.hpp"
