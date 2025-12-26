@@ -7,3 +7,8 @@ f32 Time::delta_time() {
     prev_delta = current;
     return delta;
 }
+
+// Get the amount of time since the initialisation of the app
+f32 Time::time() {
+    return ((f32)SDL_GetTicks() / 1000);
+}

@@ -8,4 +8,5 @@ class Time {
 
 public:
     f32 delta_time();
+    f32 time();
 };

@@ -114,6 +114,7 @@ int main() {
 
     multi.set_sampler(shader);
 
+    Time time;
     SDL_Event event;
 
     glEnable(GL_DEPTH_TEST);
@@ -125,7 +126,7 @@ int main() {
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
 
-        model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(0.0f, 0.5f, 1.0f));
+        model = glm::rotate(model, time.time() * glm::radians(50.0f), glm::vec3(0.0f, 0.5f, 1.0f));
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         projection = glm::perspective(
             glm::radians(45.0f),
