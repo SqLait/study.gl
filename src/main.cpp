@@ -6,7 +6,7 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include "object.hpp"
-#include "time/time.hpp"
+#include "time/timehelper.hpp"
 #include "transform.hpp"
 #include "window.hpp"
 #include <types.hpp>
@@ -80,6 +80,7 @@ u32 indices[] = {
 Shader *shad = nullptr;
 MultiTexture *mult = nullptr;
 Object *ob = nullptr;
+TimeHelper time_helper;
 
 void update() {
     shad->use();
@@ -91,12 +92,22 @@ void update() {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * i; 
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, time_helper.time() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         shad->set_mat4("model", model);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }
+
+glm::vec3 camera_pos = glm::vec3(0, 0, 3);
+glm::vec3 camera_target = glm::vec3(0, 0, 0);
+glm::vec3 camera_direction = glm::normalize(camera_pos - camera_target);
+
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
+glm::vec3 camera_right = glm::normalize(glm::cross(up, camera_direction));
+glm::vec3 camera_up = glm::vec3(0, 1, 0);
+glm::vec3 camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
+
 
 int main() {
     Window window(800, 600);
@@ -114,19 +125,20 @@ int main() {
 
     multi.set_sampler(shader);
 
-    Time time;
     SDL_Event event;
+
+    glm::mat4 view;
+    view = glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
 
     glEnable(GL_DEPTH_TEST);
     while (poll_event(event, window)) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 view = glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
         glm::mat4 projection = glm::mat4(1.0f);
 
-        model = glm::rotate(model, time.time() * glm::radians(50.0f), glm::vec3(0.0f, 0.5f, 1.0f));
+        model = glm::rotate(model, time_helper.time() * glm::radians(50.0f), glm::vec3(0.0f, 0.5f, 1.0f));
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         projection = glm::perspective(
             glm::radians(45.0f),
@@ -166,6 +178,16 @@ bool poll_event(SDL_Event &event, Window &window) {
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                     break;
             }
+
+            f32 speed = 2.5f * time_helper.delta_time();
+            if (event.key.key == SDLK_W)
+                camera_pos += speed * camera_front;
+            if (event.key.key == SDLK_S)
+                camera_pos -= speed * camera_front;
+            if (event.key.key == SDLK_A)
+                camera_pos -= glm::normalize(glm::cross(camera_front, camera_up)) * speed;
+            if (event.key.key == SDLK_D)
+                camera_pos += glm::normalize(glm::cross(camera_front, camera_up)) * speed;
         }
     }
     return true;

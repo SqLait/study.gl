@@ -2,7 +2,7 @@
 
 #include "types.hpp"
 
-class Time {
+class TimeHelper {
     f32 delta = 0;
     f32 prev_delta = 0;
 

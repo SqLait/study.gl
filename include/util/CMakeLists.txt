@@ -9,8 +9,9 @@ target_sources(util
         src/object.cpp
         src/multitexture.cpp
         src/transform.cpp
-        src/time.cpp
+        src/timehelper.cpp
         src/vertex.cpp
+        src/gmath.cpp
 )
 
 target_include_directories(util
